@@ -1,76 +1,60 @@
 # Trivia Game N'at.  O what fun it is.
-# Imports
 import random
 
-
-# Create class
 class QA:
-  def __init__(self, question, correctAnswer, otherAnswers):
-    self.question = question
-    self.corrAnsw = correctAnswer
-    self.otherAnsw = otherAnswers
+    def __init__(self, question, correctAnswer, otherAnswers, difficulty):
+        self.question = question
+        self.corrAnsw = correctAnswer
+        self.otherAnsw = otherAnswers
+        self.difficulty = difficulty
 
+# Enhanced Intro Text
+print("\nWelcome to Blake's Catholic Trivia! Choose a category and test your knowledge. Let's begin.\n")
 
-# Intro text
-print("\n")
-print("Welcome to Blake's Catholic Trivia!  Let's begin.")
-print()
+# Questions and answers
+qaList = {
+    'Virtues': [
+        QA("What are the three theological virtues?", "Faith, Hope, Charity", ["Love, Wisdom, Gentleness", "Diversity, Inclusion, Anti-Racism", "Christ-esque behavior, Being a good person, Being vaguely nice"], 'Easy'),
+        QA("What are the four cardinal virtues?", "Justice, Prudence, Temperance, Fortitude", ["Love, Tolerance, Kindness, Compassion", "Matthew, Mark, Luke, John", "Wisdom, Peace, Patience, Self-Control"], 'Medium')
+    ],
+    'Saints': [
+        QA("Which saint is deemed 'The First Martyr'?", "Saint Stephen", ["Saint Iranaeus", "Saint Paul", "Saint John", "Saint Peter"], 'Easy')
+    ],
+    'Papacy': [
+        QA("This pope had/has the longest-lasting pontificate in papal history.", "Pope Pius IX", ["Pope John Paul II", "Pope Leo XIII", "Pope Pius VI", "Pope Francis"], 'Hard'),
+        QA("What two colors comprise the papal flag?", "White and Yellow", ["Black and Yellow", "Red and White", "Roy G. Biv"], 'Medium'),
+        QA("Which of these popes was killed by a fallen ceiling?", "John XXI", ["Benedict VI","Lucius II", "John Paul I", "John VIII"], 'Hard')
+    ]
+}
 
-# Questions and answers go here.  Modify as desired.
-qaList = [
-  QA("What are the three theological virtues?", 
-      "Faith, Hope, Charity", 
-        ["Love, Wisdom, Gentleness", "Diversity, Inclusion, Anti-Racism", "Christ-esque behavior, Being a good person, Being vaguely nice"]),
-  QA("What are the four cardinal virtues?",
-      "Justice, Prudence, Temperance, Fortitude", 
-        ["Love, Tolerance, Kindness, Compassion", "Matthew, Mark, Luke, John", "Wisdom, Peace, Patience, Self-Control"]),
-  QA("Which saint is deemed 'The First Martyr'?",
-      "Saint Stephen", 
-        ["Saint Iranaeus", "Saint Paul", "Saint John", "Saint Peter"]),
-  QA("This pope had/has the longest-lasting pontificate in papal history.",
-      "Pope Piux IX",
-        ["Pope John Paul II", "Pope Leo XIII", "Pope Pius VI", "Pope Francis"]),
-  QA("What two colors comprise the papal flag?",
-      "White and Yellow",
-        ["Black and Yellow", "Red and White", "Roy G. Biv"]),
-  QA("Which of these popes was killed by a fallen ceiling?",
-      "John XXI",
-        ["Benedict VI","Lucius II", "John Paul I", "John VIII"])
-]
-# TODO: insert line break between answers and prompt
+# Scoring System
+points = {'Easy': 10, 'Medium': 20, 'Hard': 30}
+total_score = 0
 
-# Shuffle Everything
-corrCount = 0
-random.shuffle(qaList)
-for qaItem in qaList:
-  print(qaItem.question)
-  possible = qaItem.otherAnsw + [qaItem.corrAnsw] # square brackets turn correct answer into list for concatenating with other list
-  random.shuffle(possible)
-  count = 0 # list indexes start at 0 in python
-  while count < len(possible):
-    print(str(count+1) + ": " + possible[count])
-    count += 1
-  print("Select your number and press enter:")
-  userAnsw = input()
-  while not userAnsw.isdigit():
-    print("That was not a number. Please enter the number of your answer:")
-    userAnsw = input()
-  userAnsw = int(userAnsw)
-  while not (userAnsw > 0 and userAnsw <= len(possible)):
-    print("That number doesn't correspond to an answer. Please enter an available number and press enter:")
-    userAnsw = input()
-  if possible[userAnsw-1] == qaItem.corrAnsw:
-    print("Correct.")
-    corrCount += 1
-  else:
-    print("Incorrect.")
-    print("The correct answer was: " + qaItem.corrAnsw)
-  print()
+# Category Selection
+print("Categories:")
+for idx, category in enumerate(qaList, 1):
+    print(f"{idx}. {category}")
+category_choice = int(input("Choose a category by number: "))
+selected_category = list(qaList.keys())[category_choice - 1]
 
+# Shuffle Questions
+random.shuffle(qaList[selected_category])
+for qaItem in qaList[selected_category]:
+    print(f"\n{qaItem.question} (Difficulty: {qaItem.difficulty})")
+    possible = qaItem.otherAnsw + [qaItem.corrAnsw]
+    random.shuffle(possible)
+    
+    for idx, option in enumerate(possible, 1):
+        print(f"{idx}: {option}")
+    
+    userAnsw = int(input("\nSelect your number and press enter: "))
+    if possible[userAnsw-1] == qaItem.corrAnsw:
+        print("Correct!")
+        total_score += points[qaItem.difficulty]
+    else:
+        print("Incorrect. The correct answer was: " + qaItem.corrAnsw)
 
 # Results and Finale
-correct_pct = (corrCount / len(qaList)) * 100
-print("You answered " + str(corrCount) + " of " + str(len(qaList)) + " questions correctly, " + str(correct_pct) + " %.")
-print()
-print("Thanks for playing!")
-print()
+print(f"\nYour total score is: {total_score} points.")
+print("\nThanks for playing!")
