@@ -9,7 +9,7 @@ class QA:
         self.difficulty = difficulty
 
 # Enhanced Intro Text
-print("\nWelcome to Blake's Catholic Trivia! Choose a category and test your knowledge. Let's begin.\n")
+print("\nWelcome to Blake's Catholic Trivia! Choose a category and test your knowledge. Let us begin.\n")
 
 # Questions and answers
 qaList = {
@@ -23,37 +23,79 @@ qaList = {
     'Papacy': [
         QA("This pope had/has the longest-lasting pontificate in papal history.", "Pope Pius IX", ["Pope John Paul II", "Pope Leo XIII", "Pope Pius VI", "Pope Francis"], 'Hard'),
         QA("What two colors comprise the papal flag?", "White and Yellow", ["Black and Yellow", "Red and White", "Roy G. Biv"], 'Medium'),
-        QA("Which of these popes was killed by a fallen ceiling?", "John XXI", ["Benedict VI","Lucius II", "John Paul I", "John VIII"], 'Hard')
+        QA("This pope was killed by a fallen ceiling.", "John XXI", ["Benedict VI","Lucius II", "John Paul I", "John VIII"], 'Hard')
     ]
 }
+
+# Add new categories and questions here
+qaList.update({
+    'Liturgy': [
+        QA("What liturgical season is dedicated to preparation for Easter?", "Lent", ["Advent", "Ordinary Time", "Christmas"], 'Medium'),
+        QA("What color is typically worn by priests during Lent?", "Purple", ["Green", "White", "Red"], 'Easy')
+    ],
+    'Sacraments': [
+        QA("How many sacraments does the Catholic Church recognize?", "Seven", ["Five", "Six", "Eight"], 'Easy'),
+        QA("Which sacrament is considered the 'source and summit of the Christian life'?", "Eucharist", ["Baptism", "Confirmation", "Holy Orders"], 'Medium')
+    ],
+    'Bible': [
+        QA("Who betrayed Jesus for thirty pieces of silver?", "Judas Iscariot", ["Pontius Pilate", "King Herod", "Peter"], 'Easy'),
+        QA("In which book of the Bible is the story of the Exodus found?", "Exodus", ["Genesis", "Leviticus", "Numbers"], 'Medium')
+    ],
+    'Church History': [
+        QA("Which council defined the Nicene Creed?", "First Council of Nicaea", ["Council of Trent", "First Vatican Council", "Second Vatican Council"], 'Hard'),
+        QA("Who founded the Benedictine Order?", "Saint Benedict of Nursia", ["Saint Francis of Assisi", "Saint Dominic", "Saint Ignatius of Loyola"], 'Medium')
+    ]
+})
 
 # Scoring System
 points = {'Easy': 10, 'Medium': 20, 'Hard': 30}
 total_score = 0
 
-# Category Selection
-print("Categories:")
-for idx, category in enumerate(qaList, 1):
-    print(f"{idx}. {category}")
-category_choice = int(input("Choose a category by number: "))
-selected_category = list(qaList.keys())[category_choice - 1]
+def get_user_input(prompt, max_choice):
+    while True:
+        user_input = input(prompt)
+        if user_input.isdigit():
+            user_choice = int(user_input)
+            if 1 <= user_choice <= max_choice:
+                return user_choice
+            else:
+                print(f"Please enter a number between 1 and {max_choice}.")
+        else:
+            print("That was not a valid number. Please try again.")
 
-# Shuffle Questions
-random.shuffle(qaList[selected_category])
-for qaItem in qaList[selected_category]:
-    print(f"\n{qaItem.question} (Difficulty: {qaItem.difficulty})")
-    possible = qaItem.otherAnsw + [qaItem.corrAnsw]
-    random.shuffle(possible)
+def ask_question(category):
+    global total_score
+    random.shuffle(qaList[category])
+    for qaItem in qaList[category]:
+        print(f"\n{qaItem.question} (Difficulty: {qaItem.difficulty})")
+        possible = qaItem.otherAnsw + [qaItem.corrAnsw]
+        random.shuffle(possible)
+        
+        for idx, option in enumerate(possible, 1):
+            print(f"{idx}: {option}")
+        
+        userAnsw = get_user_input("\nSelect your number and press enter: ", len(possible))
+        if possible[userAnsw-1] == qaItem.corrAnsw:
+            print("Correct!")
+            total_score += points[qaItem.difficulty]
+        else:
+            print("Incorrect. The correct answer was: " + qaItem.corrAnsw)
+        break  # Break after one question to return to category selection
+
+# Game loop
+while True:
+    print("\nCategories:")
+    for idx, category in enumerate(qaList, 1):
+        print(f"{idx}. {category}")
+    print(f"{len(qaList) + 1}. Exit")
     
-    for idx, option in enumerate(possible, 1):
-        print(f"{idx}: {option}")
+    category_choice = get_user_input("Choose a category by number or exit: ", len(qaList) + 1)
     
-    userAnsw = int(input("\nSelect your number and press enter: "))
-    if possible[userAnsw-1] == qaItem.corrAnsw:
-        print("Correct!")
-        total_score += points[qaItem.difficulty]
-    else:
-        print("Incorrect. The correct answer was: " + qaItem.corrAnsw)
+    if category_choice == len(qaList) + 1:
+        break  # Exit the game
+    
+    selected_category = list(qaList.keys())[category_choice - 1]
+    ask_question(selected_category)
 
 # Results and Finale
 print(f"\nYour total score is: {total_score} points.")
